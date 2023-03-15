@@ -4,22 +4,29 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 
-public static class SyntaxHelpers
+public static class GeneratorHelpers
 {
-    public static ImmutableArray<string> ValidBindingModes
-            => ImmutableArray.Create( "Default", "OneTime", "OneWay", "OneWayToSource", "TwoWay" );
+    public static ImmutableHashSet<string> ValidAttributeArguments
+            => ImmutableHashSet.Create(
+                                        "DeclaringType",
+                                        "DefaultBindingMode",
+                                        "DefaultValue",
+                                        "ValidateValue",
+                                        "PropertyChanged",
+                                        "PropertyChanging",
+                                        "CoerceValue",
+                                        "DefaultValueCreator",
+                                        "HidesBaseProperty"
+                                      );
 
-    /// <summary>
-    /// Returns a simple name regardless of whether or not it is qualified,
-    /// or an empty string if neither
-    /// </summary>
-    public static string ExtractName( NameSyntax? name ) 
-        => name switch
-        {
-            SimpleNameSyntax    simple      => simple.Identifier.Text,
-            QualifiedNameSyntax qualified   => qualified.Right.Identifier.Text,
-            _ => ""
-        };
+    public static ImmutableHashSet<string> ValidBindingModes
+            => ImmutableHashSet.Create( 
+                                        "Default", 
+                                        "OneTime", 
+                                        "OneWay", 
+                                        "OneWayToSource", 
+                                        "TwoWay" 
+                                      );
 
     /// <summary>
     /// Validate attribute name with or without qualification
@@ -33,9 +40,27 @@ public static class SyntaxHelpers
             return true;
 
         return name is QualifiedNameSyntax qualified &&
-             qualified.Right.Identifier.Text is "BindableProperty" or "BindablePropertyAttribute" &&
+             qualified.Right.Identifier.Text is "BindableProperty" 
+                                             or "BindablePropertyAttribute" &&
              qualified.Left is SimpleNameSyntax nameSpace &&
              nameSpace.Identifier.Text is "BindablePropertyAttributes";
+    }
+
+    public static bool HasValidAttributeArguments( AttributeSyntax attributeSyntax )
+    {
+        //  No arguments is valid
+        if ( attributeSyntax.ArgumentList is null || attributeSyntax.ArgumentList.Arguments.Count == 0 )
+            return true;
+
+        foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
+        {
+            var argumentName =  argument?.NameEquals?.Name.Identifier.Text;
+
+            if ( argumentName is null || ! ValidAttributeArguments.Contains( argumentName ) )
+                break;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -43,7 +68,7 @@ public static class SyntaxHelpers
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static bool IsInvalidBindingMode( AttributeSyntax attributeSyntax )
+    public static bool IsValidBindingMode( AttributeSyntax attributeSyntax )
     {
         if ( attributeSyntax.ArgumentList is not null )
             foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
@@ -59,14 +84,11 @@ public static class SyntaxHelpers
                     if ( expr.StartsWith( "BindingMode." ) )
                         expr = expr.Substring( expr.IndexOf( '.' ) + 1 );
 
-                    if ( ValidBindingModes.Contains( expr ) )
-                        return false;
+                    return ValidBindingModes.Contains( expr );
                 }
-
-                return true;
             }
 
-        return false;
+        return true;
     }
 
     /// <summary>

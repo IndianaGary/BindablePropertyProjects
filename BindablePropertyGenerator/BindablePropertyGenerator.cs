@@ -47,15 +47,14 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
         switch ( node )
         {
             case AttributeSyntax attribute:
-                if ( SyntaxHelpers.IsValidAttribute( attribute.Name ) )
-                    return ! SyntaxHelpers.IsInvalidBindingMode( attribute );
-
-                break;
+                return GeneratorHelpers.IsValidAttribute( attribute.Name ) &&
+                       GeneratorHelpers.HasValidAttributeArguments( attribute ) &&
+                       GeneratorHelpers.IsValidBindingMode( attribute );
 
             case ClassDeclarationSyntax cls:
                 if ( cls.IsValidClassDeclaration() && _namespaceName is null )
                 {
-                    _namespaceName = SyntaxHelpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
+                    _namespaceName = GeneratorHelpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
                     _isFileScopedNamespace = isFileScoped;
                 }
 
@@ -97,7 +96,7 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
             return model;
 
         //  Only handle MY BindableProperty attributes
-        if ( ! SyntaxHelpers.IsValidFieldSymbol( fieldType ) )
+        if ( ! GeneratorHelpers.IsValidFieldSymbol( fieldType ) )
             return model;
 
         //  Fill in information from the field

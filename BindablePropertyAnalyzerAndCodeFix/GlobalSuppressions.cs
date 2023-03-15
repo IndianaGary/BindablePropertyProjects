@@ -6,4 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage( "Style", "IDE0007:Use implicit type", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyAnalyzerAndCodeFix.BindablePropertyAnalyzer.AnalyzeSyntax(Microsoft.CodeAnalysis.Diagnostics.SyntaxNodeAnalysisContext)" )]
-[assembly: SuppressMessage( "Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyAnalyzerAndCodeFix.SyntaxHelpers.IsValidAttribute(Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax)~System.Boolean" )]
+[assembly: SuppressMessage( "Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyAnalyzerAndCodeFix.AnalyzerHelpers.IsValidAttribute(Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax)~System.Boolean" )]

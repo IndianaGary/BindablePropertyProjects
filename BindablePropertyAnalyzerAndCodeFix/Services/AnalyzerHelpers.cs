@@ -8,10 +8,29 @@ using System.Collections.Immutable;
 using System.Reflection;
 using System.Xml.Linq;
 
-public static class SyntaxHelpers
+public static class AnalyzerHelpers
 {
-    public static ImmutableArray<string> ValidBindingModes 
-            => ImmutableArray.Create( "Default", "OneTime", "OneWay", "OneWayToSource", "TwoWay" );
+    public static ImmutableHashSet<string> ValidAttributeArguments
+            => ImmutableHashSet.Create(
+                                        "DeclaringType",
+                                        "DefaultBindingMode",
+                                        "DefaultValue",
+                                        "ValidateValue",
+                                        "PropertyChanged",
+                                        "PropertyChanging",
+                                        "CoerceValue",
+                                        "DefaultValueCreator",
+                                        "HidesBaseProperty"
+                                      );
+
+    public static ImmutableHashSet<string> ValidBindingModes
+            => ImmutableHashSet.Create(
+                                        "Default",
+                                        "OneTime",
+                                        "OneWay",
+                                        "OneWayToSource",
+                                        "TwoWay"
+                                      );
 
     /// <summary>
     /// Returns a simple name regardless of whether or not it is qualified,
@@ -42,6 +61,30 @@ public static class SyntaxHelpers
              nameSpace.Identifier.Text is "BindablePropertyAttributes";
     }
 
+    public static bool HasInvalidAttributeArguments( AttributeSyntax attributeSyntax, out string? errorArgument, out Location? errorLocation )
+    {
+        errorLocation = null;
+        errorArgument = null;
+
+        //  No arguments is valid
+        if ( attributeSyntax.ArgumentList is null || attributeSyntax.ArgumentList.Arguments.Count == 0 )
+            return false;
+
+        foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
+        {
+            var argumentName =  argument?.NameEquals?.Name.Identifier.Text;
+
+            if ( argumentName is not null && ! ValidAttributeArguments.Contains( argumentName ) )
+            {
+                errorArgument   =   argumentName;
+                errorLocation   =   argument?.NameEquals?.Name.GetLocation();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// This is a BindableProperty, so check for a valid BindingMode
     /// </summary>
@@ -69,7 +112,7 @@ public static class SyntaxHelpers
                         return false;
                 }
 
-                location = argument?.GetLocation();
+                location = argument?.Expression.GetLocation();
                 return true;
             }
 

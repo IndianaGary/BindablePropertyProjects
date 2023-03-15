@@ -26,13 +26,4 @@ public static class SyntaxExtensions
 
     public static bool IsValidClassDeclaration( this ClassDeclarationSyntax cls ) 
             => ! cls.IsStaticClass() && cls.IsPartialClass();
-
-    /// <summary>
-    /// Determines whether a field declaration includes the static modifier
-    /// </summary>
-    public static bool IsStaticField( this FieldDeclarationSyntax fld )
-    {
-        var result = fld.Modifiers.Any( modifier => modifier.IsKind( SyntaxKind.StaticKeyword ) );
-        return result;
-    }
 }

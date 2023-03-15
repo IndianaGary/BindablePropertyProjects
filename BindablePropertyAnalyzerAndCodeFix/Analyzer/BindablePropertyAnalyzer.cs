@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
-using System.Reflection;
 
 [DiagnosticAnalyzer( LanguageNames.CSharp )]
 public class BindablePropertyAnalyzer : DiagnosticAnalyzer
@@ -39,10 +38,17 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
         if ( context.Node is AttributeSyntax attributeSyntax )
         {
             //  See if this is a [BindableProperty] attribute
-            if ( ! SyntaxHelpers.IsValidAttribute( attributeSyntax.Name) )
+            if ( ! AnalyzerHelpers.IsValidAttribute( attributeSyntax.Name) )
                 return;
 
-            if ( SyntaxHelpers.IsInvalidBindingMode( attributeSyntax, out var errorLocation ) )
+            if ( AnalyzerHelpers.HasInvalidAttributeArguments(attributeSyntax, out var argumentName, out var argumentLocation ) )
+            {
+                var error = Diagnostic.Create( Diagnostics.InvalidArgument, argumentLocation, argumentName );
+                context.ReportDiagnostic( error );
+                return;
+            }
+
+            if ( AnalyzerHelpers.IsInvalidBindingMode( attributeSyntax, out var errorLocation ) )
             {
                 var error = Diagnostic.Create( Diagnostics.InvalidBindingMode, errorLocation );
                 context.ReportDiagnostic( error );
@@ -58,7 +64,7 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
                 return;
 
             //  See if decorated with the MY BindableProperty attribute
-            if ( ! SyntaxHelpers.IsValidFieldSymbol( firstField ) )
+            if ( ! AnalyzerHelpers.IsValidFieldSymbol( firstField ) )
                 return;
 
             //  Get the number of fields declared in the statement
@@ -67,25 +73,24 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
             //  More than one field declaration is ambiguous
             if ( variableCount != 1 )
             {
-                var start       = fieldDeclaration.Declaration.Variables[ 0 ].FullSpan.Start;
-                var end         = fieldDeclaration.Declaration.Variables[ variableCount - 1 ].FullSpan.End;
-                var newFullSpan = new TextSpan( start, end - start + 1 );
-                var location    = Location.Create( fieldDeclaration.SyntaxTree, newFullSpan );
-
-                var error       = Diagnostic.Create( Diagnostics.AmbiguousFieldNames, location );
+                var start           = fieldDeclaration.Declaration.Variables[ 0 ].FullSpan.Start;
+                var end             = fieldDeclaration.Declaration.Variables[ variableCount - 1 ].FullSpan.End;
+                var newFullSpan     = new TextSpan( start, end - start + 1 );
+                var fieldLocation   = Location.Create( fieldDeclaration.SyntaxTree, newFullSpan );
+                var error           = Diagnostic.Create( Diagnostics.AmbiguousFieldNames, fieldLocation );
 
                 context.ReportDiagnostic( error );
                 return;
             }
 
             //  Get the class the field is declared in
-            if ( SyntaxHelpers.TryGetDeclaringClass( fieldDeclaration, out ClassDeclarationSyntax? parentClass ) )
+            if ( AnalyzerHelpers.TryGetDeclaringClass( fieldDeclaration, out ClassDeclarationSyntax? parentClass ) )
             {
                 if ( parentClass is null )
                     return;
 
                 var className               = parentClass.Identifier.ToString();
-                var fullyQualifiedClassName = SyntaxHelpers.GetFullyQualifiedNamespaceName( parentClass, out bool _ )
+                var fullyQualifiedClassName = AnalyzerHelpers.GetFullyQualifiedNamespaceName( parentClass, out bool _ )
                                             + "." + className;
 
                 //  If class name is cached, it's already been reported, skip it
