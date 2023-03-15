@@ -42,6 +42,13 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
             if ( ! SyntaxHelpers.IsValidAttribute( attributeSyntax.Name) )
                 return;
 
+            if ( SyntaxHelpers.IsInvalidBindingMode( attributeSyntax, out var errorLocation ) )
+            {
+                var error = Diagnostic.Create( Diagnostics.InvalidBindingMode, errorLocation );
+                context.ReportDiagnostic( error );
+                return;
+            }
+
             //  Now, see if it is parented by a field
             if ( attributeSyntax.Parent?.Parent is not FieldDeclarationSyntax fieldDeclaration )
                 return;

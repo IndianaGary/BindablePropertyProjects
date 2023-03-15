@@ -2,9 +2,17 @@
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using System;
+using System.Collections.Immutable;
+using System.Reflection;
+using System.Xml.Linq;
 
 public static class SyntaxHelpers
 {
+    public static ImmutableArray<string> ValidBindingModes 
+            => ImmutableArray.Create( "Default", "OneTime", "OneWay", "OneWayToSource", "TwoWay" );
+
     /// <summary>
     /// Returns a simple name regardless of whether or not it is qualified,
     /// or an empty string if neither
@@ -35,7 +43,41 @@ public static class SyntaxHelpers
     }
 
     /// <summary>
-    /// Used by the generator to determine whether the specified field is valid.
+    /// This is a BindableProperty, so check for a valid BindingMode
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static bool IsInvalidBindingMode( AttributeSyntax attributeSyntax, out Location? location )
+    {
+        location = null;
+
+        if ( attributeSyntax.ArgumentList is not null )
+            foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
+            {
+                var argumentName =  argument?.NameEquals?.Name.Identifier.Text;
+                var expr         =  argument?.Expression.GetFirstToken().Text.Unquote();
+
+                if ( argumentName is null || expr is null )
+                    continue;
+
+                if ( argumentName == "DefaultBindingMode" )
+                { 
+                    if ( expr.StartsWith( "BindingMode.") )
+                        expr = expr.Substring( expr.IndexOf( '.' ) + 1 );
+
+                    if ( ValidBindingModes.Contains( expr ) )
+                        return false;
+                }
+
+                location = argument?.GetLocation();
+                return true;
+            }
+
+            return false;
+    }
+
+    /// <summary>
+    /// Used by to determine whether the specified field is valid.
     /// </summary>
     public static bool IsValidFieldSymbol( ISymbol symbol )
     {
@@ -54,6 +96,9 @@ public static class SyntaxHelpers
         return result;
     }
 
+    /// <summary>
+    /// Given a field, locate its class declaration
+    /// </summary>
     public static bool TryGetDeclaringClass( FieldDeclarationSyntax fieldDeclaration, out ClassDeclarationSyntax? classDeclaration )
     {
         var parentNode      =   fieldDeclaration.Parent;

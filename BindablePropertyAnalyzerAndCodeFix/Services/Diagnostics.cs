@@ -30,11 +30,20 @@ public static class Diagnostics
                   DiagnosticSeverity.Error,
                   true );
 
+    public static readonly DiagnosticDescriptor InvalidArgument
+           = new( "GLLBP004",                                // id
+                  "Invalid argument",                        // title
+                  "{0} is not a valid argument",             // message
+                  "BindablePropertyAnalyzer",                // category
+                  DiagnosticSeverity.Error,
+                  true );
+
     public static readonly ImmutableArray<DiagnosticDescriptor> Descriptors
         =   ImmutableArray.Create(
                                    Diagnostics.ClassMustBePartial,
                                    Diagnostics.AmbiguousFieldNames,
-                                   Diagnostics.InvalidBindingMode
+                                   Diagnostics.InvalidBindingMode,
+                                   Diagnostics.InvalidArgument
                                  );
 }
 #pragma warning restore IDE1006 // Naming Styles

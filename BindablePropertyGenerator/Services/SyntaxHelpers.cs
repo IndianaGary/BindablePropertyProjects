@@ -2,9 +2,13 @@
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
 
 public static class SyntaxHelpers
 {
+    public static ImmutableArray<string> ValidBindingModes
+            => ImmutableArray.Create( "Default", "OneTime", "OneWay", "OneWayToSource", "TwoWay" );
+
     /// <summary>
     /// Returns a simple name regardless of whether or not it is qualified,
     /// or an empty string if neither
@@ -32,6 +36,37 @@ public static class SyntaxHelpers
              qualified.Right.Identifier.Text is "BindableProperty" or "BindablePropertyAttribute" &&
              qualified.Left is SimpleNameSyntax nameSpace &&
              nameSpace.Identifier.Text is "BindablePropertyAttributes";
+    }
+
+    /// <summary>
+    /// This is a BindableProperty, so check for a valid BindingMode
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static bool IsInvalidBindingMode( AttributeSyntax attributeSyntax )
+    {
+        if ( attributeSyntax.ArgumentList is not null )
+            foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
+            {
+                var argumentName =  argument?.NameEquals?.Name.Identifier.Text;
+                var expr         =  argument?.Expression.GetFirstToken().Text.Unquote();
+
+                if ( argumentName is null || expr is null )
+                    continue;
+
+                if ( argumentName == "DefaultBindingMode" )
+                {
+                    if ( expr.StartsWith( "BindingMode." ) )
+                        expr = expr.Substring( expr.IndexOf( '.' ) + 1 );
+
+                    if ( ValidBindingModes.Contains( expr ) )
+                        return false;
+                }
+
+                return true;
+            }
+
+        return false;
     }
 
     /// <summary>

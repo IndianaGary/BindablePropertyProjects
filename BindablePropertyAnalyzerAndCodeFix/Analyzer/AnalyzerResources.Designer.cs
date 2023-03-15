@@ -115,7 +115,7 @@ namespace BindablePropertyAnalyzerAndCodeFix.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Argument must be a Maui BindingMode value.
         /// </summary>
         public static string GLLBP003Description {
             get {
@@ -124,7 +124,7 @@ namespace BindablePropertyAnalyzerAndCodeFix.Analyzer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Argument must be a valid BindingMode.
         /// </summary>
         public static string GLLBP003MessageFormat {
             get {
@@ -138,6 +138,33 @@ namespace BindablePropertyAnalyzerAndCodeFix.Analyzer {
         public static string GLLBP003Title {
             get {
                 return ResourceManager.GetString("GLLBP003Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not a valid BindableProperty argument.
+        /// </summary>
+        public static string GLLBP004Description {
+            get {
+                return ResourceManager.GetString("GLLBP004Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a valid argument.
+        /// </summary>
+        public static string GLLBP004MessageFormat {
+            get {
+                return ResourceManager.GetString("GLLBP004MessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid argument.
+        /// </summary>
+        public static string GLLBP004Title {
+            get {
+                return ResourceManager.GetString("GLLBP004Title", resourceCulture);
             }
         }
     }
