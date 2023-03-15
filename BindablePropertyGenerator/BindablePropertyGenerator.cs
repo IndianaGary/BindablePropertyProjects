@@ -44,16 +44,25 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
     /// </summary>
     bool IsAttributeOrClassDeclaration( SyntaxNode node )
     {
-        if ( node is AttributeSyntax attribute )
-            return SyntaxHelpers.IsValidAttribute( attribute.Name );
-
-        if ( node is ClassDeclarationSyntax cls )
+        switch ( node )
         {
-            if ( cls.IsValidClassDeclaration() && _namespaceName is null )
-            { 
-                _namespaceName          = SyntaxHelpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
-                _isFileScopedNamespace  = isFileScoped;
-            }
+            case AttributeSyntax attribute:
+                if ( SyntaxHelpers.IsValidAttribute( attribute.Name ) )
+                    return ! SyntaxHelpers.IsInvalidBindingMode( attribute );
+
+                break;
+
+            case ClassDeclarationSyntax cls:
+                if ( cls.IsValidClassDeclaration() && _namespaceName is null )
+                {
+                    _namespaceName = SyntaxHelpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
+                    _isFileScopedNamespace = isFileScoped;
+                }
+
+                break;
+
+            default:
+                break;
         }
 
         return false;
