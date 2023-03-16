@@ -1,8 +1,11 @@
 ﻿namespace BindablePropertyAnalyzerAndCodeFix.UnitTests;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS = CSharpCodeFixVerifier<BindablePropertyAnalyzer, BindablePropertyCodeFixProvider>;
+using VerifyCS = CSharpCodeFixVerifier<BindablePropertyFeatures.BindablePropertyAnalyzer,
+                                       BindablePropertyCodeFix.BindablePropertyCodeFixProvider>;
+
 [TestClass]
 public class AnalyzerUnitTests
 {
@@ -68,6 +71,52 @@ public class AnalyzerUnitTests
     }
 
     [TestMethod]
+    public async Task Should_Fail_Because_Attribute_Argument_Is_Invalid()
+    {
+        //  Arrange
+        var codeToTest = """
+            namespace UnitTest;
+
+            using BindablePropertyAttributes;
+            using Microsoft.Maui.Controls;
+            using Microsoft.Maui.Graphics;
+            
+            public partial class TestFile : ContentView
+            {
+                [BindableProperty( InvalidArgument="true" ) ]
+                public Color _backgroundColor, _color2;
+            }
+            """;
+        DiagnosticDescriptor expected1 = new
+            (
+              id: "GLLBP004",
+              title: "",
+              messageFormat: "{0} is not a valid BindableProperty attribute argument",
+              defaultSeverity: DiagnosticSeverity.Error,
+              category: "BindablePropertyAnalyzer",
+              isEnabledByDefault: true 
+            );
+
+        DiagnosticDescriptor expected2 = new
+            (
+              id: "CS0246",
+              title: "",
+              messageFormat: "The type or namespace name '{0}' could not be found (are you missing a using directive or an assembly reference?)",
+              defaultSeverity: DiagnosticSeverity.Error,
+              category: "BindablePropertyAnalyzer",
+              isEnabledByDefault: true
+            );
+
+
+        //  Act
+        var myError1     = VerifyCS.Diagnostic( expected1 ).WithSpan( 9, 24, 9, 39 ).WithArguments("InvalidArgument");
+        var myError2     = VerifyCS.Diagnostic( expected2 ).WithSpan( 9, 24, 9, 39 ).WithArguments("InvalidArgument");
+
+        //  Assert
+        await VerifyCS.VerifyAnalyzerAsync( codeToTest, myError1, myError2, myError2 );
+    }
+
+    [TestMethod]
     public async Task Should_Fail_Because_BindingMode_Is_Invalid_V1()
     {
         //  Arrange
@@ -86,7 +135,7 @@ public class AnalyzerUnitTests
             """;
 
         //  Act
-        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 24, 9, 52 );
+        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 43, 9, 52 ).WithArguments("BadMode");
 
         //  Assert
         await VerifyCS.VerifyAnalyzerAsync( codeToTest, expected );
@@ -111,7 +160,7 @@ public class AnalyzerUnitTests
             """;
 
         //  Act
-        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 24, 9, 64 );
+        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 43, 9, 64 ).WithArguments("BadMode"); ;
 
         //  Assert
         await VerifyCS.VerifyAnalyzerAsync( codeToTest, expected );

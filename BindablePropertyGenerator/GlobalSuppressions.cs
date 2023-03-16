@@ -5,4 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage( "Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyGenerator.GeneratorHelpers.IsValidAttribute(Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax)~System.Boolean" )]
+[assembly: SuppressMessage( "Style", "IDE0066:Convert switch statement to expression", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyServices.Helpers.IsValidAttribute(Microsoft.CodeAnalysis.CSharp.Syntax.NameSyntax)~System.Boolean" )]
+[assembly: SuppressMessage( "Style", "IDE2003:Blank line required between block and subsequent statement", Justification = "<Pending>", Scope = "member", Target = "~M:BindablePropertyFeatures.BindablePropertyGenerator.IsAttributeOrClassDeclaration(Microsoft.CodeAnalysis.SyntaxNode)~System.Boolean" )]

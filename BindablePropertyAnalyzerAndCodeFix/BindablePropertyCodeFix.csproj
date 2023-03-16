@@ -24,10 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Update="Analyzer\AnalyzerResources.resx">
-            <Generator></Generator>
-        </EmbeddedResource>
-        <EmbeddedResource Update="CodeFix\CodeFixResources.resx">
+        <EmbeddedResource Update="CodeFixResources.resx">
             <Generator></Generator>
         </EmbeddedResource>
     </ItemGroup>

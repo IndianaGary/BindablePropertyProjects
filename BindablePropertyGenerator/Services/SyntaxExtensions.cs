@@ -1,4 +1,4 @@
-﻿namespace BindablePropertyGenerator;
+﻿namespace BindablePropertyServices;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

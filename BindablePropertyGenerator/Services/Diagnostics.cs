@@ -1,4 +1,4 @@
-﻿namespace BindablePropertyAnalyzerAndCodeFix;
+﻿namespace BindablePropertyServices;
 
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
@@ -25,7 +25,7 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor InvalidBindingMode
            = new( "GLLBP003",                                // id
                   "Invalid BindingMode",                     // title
-                  "Argument must be a valid BindingMode",    // message
+                  "{0} is not a valid BindingMode",          // message
                   "BindablePropertyAnalyzer",                // category
                   DiagnosticSeverity.Error,
                   true );
@@ -33,7 +33,7 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor InvalidArgument
            = new( "GLLBP004",                                // id
                   "Invalid argument",                        // title
-                  "{0} is not a valid argument",             // message
+                  "{0} is not a valid BindableProperty attribute argument", // message
                   "BindablePropertyAnalyzer",                // category
                   DiagnosticSeverity.Error,
                   true );

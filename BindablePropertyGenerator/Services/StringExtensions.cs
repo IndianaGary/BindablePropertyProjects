@@ -1,6 +1,4 @@
-﻿namespace BindablePropertyGenerator;
-
-using System.Resources;
+﻿namespace BindablePropertyServices;
 
 public static class StringExtensions
 {

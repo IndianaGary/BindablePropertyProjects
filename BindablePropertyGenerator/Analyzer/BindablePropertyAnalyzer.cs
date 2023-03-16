@@ -1,4 +1,4 @@
-﻿namespace BindablePropertyAnalyzerAndCodeFix;
+﻿namespace BindablePropertyFeatures;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
+using BindablePropertyServices;
 
 [DiagnosticAnalyzer( LanguageNames.CSharp )]
 public class BindablePropertyAnalyzer : DiagnosticAnalyzer
@@ -38,19 +39,19 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
         if ( context.Node is AttributeSyntax attributeSyntax )
         {
             //  See if this is a [BindableProperty] attribute
-            if ( ! AnalyzerHelpers.IsValidAttribute( attributeSyntax.Name) )
+            if ( ! Helpers.IsValidAttribute( attributeSyntax.Name) )
                 return;
 
-            if ( AnalyzerHelpers.HasInvalidAttributeArguments(attributeSyntax, out var argumentName, out var argumentLocation ) )
+            if ( Helpers.HasInvalidAttributeArguments(attributeSyntax, out var argumentName, out var argumentLocation ) )
             {
                 var error = Diagnostic.Create( Diagnostics.InvalidArgument, argumentLocation, argumentName );
                 context.ReportDiagnostic( error );
                 return;
             }
 
-            if ( AnalyzerHelpers.IsInvalidBindingMode( attributeSyntax, out var errorLocation ) )
+            if ( Helpers.IsInvalidBindingMode( attributeSyntax, out var argumentValue, out var errorLocation ) )
             {
-                var error = Diagnostic.Create( Diagnostics.InvalidBindingMode, errorLocation );
+                var error = Diagnostic.Create( Diagnostics.InvalidBindingMode, errorLocation, argumentValue );
                 context.ReportDiagnostic( error );
                 return;
             }
@@ -64,7 +65,7 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
                 return;
 
             //  See if decorated with the MY BindableProperty attribute
-            if ( ! AnalyzerHelpers.IsValidFieldSymbol( firstField ) )
+            if ( ! Helpers.IsValidFieldSymbol( firstField ) )
                 return;
 
             //  Get the number of fields declared in the statement
@@ -84,13 +85,13 @@ public class BindablePropertyAnalyzer : DiagnosticAnalyzer
             }
 
             //  Get the class the field is declared in
-            if ( AnalyzerHelpers.TryGetDeclaringClass( fieldDeclaration, out ClassDeclarationSyntax? parentClass ) )
+            if ( Helpers.TryGetDeclaringClass( fieldDeclaration, out var parentClass ) )
             {
                 if ( parentClass is null )
                     return;
 
                 var className               = parentClass.Identifier.ToString();
-                var fullyQualifiedClassName = AnalyzerHelpers.GetFullyQualifiedNamespaceName( parentClass, out bool _ )
+                var fullyQualifiedClassName = Helpers.GetFullyQualifiedNamespaceName( parentClass, out var _ )
                                             + "." + className;
 
                 //  If class name is cached, it's already been reported, skip it

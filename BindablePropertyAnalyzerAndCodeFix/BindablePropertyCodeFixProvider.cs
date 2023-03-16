@@ -1,6 +1,5 @@
-﻿namespace BindablePropertyAnalyzerAndCodeFix;
+﻿namespace BindablePropertyCodeFix;
 
-using BindablePropertyAnalyzerAndCodeFix.CodeFix;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -19,25 +18,13 @@ public class BindablePropertyCodeFixProvider : CodeFixProvider
     /// Localizable descriptor ids
     /// </summary
     public static ImmutableArray<string> LocalizableDescriptorTitles 
-            => ImmutableArray.Create(
-                                      CodeFixResources.GLLBP001,
-                                      CodeFixResources.GLLBP002
-                                    );
-
-    private static ImmutableArray<Func<Document, CSharpSyntaxNode, CancellationToken, Task<Document>>> CodeFixes 
-            => ImmutableArray.Create(
-                                      MakePartialAsync,
-                                      RemoveAmbiguousFields
-                                    );
+            => ImmutableArray.Create( CodeFixResources.GLLBP001, CodeFixResources.GLLBP002 );
 
     /// <summary>
     /// List of available correctable Diagnostics 
     /// </summary>
     public sealed override ImmutableArray<string> FixableDiagnosticIds 
-            => ImmutableArray.Create(
-                                      Diagnostics.ClassMustBePartial.Id,
-                                      Diagnostics.AmbiguousFieldNames.Id
-                                    );
+            => ImmutableArray.Create( "GLLBP001", "GLLBP002" );
 
     /// <summary>
     /// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md 
@@ -64,26 +51,41 @@ public class BindablePropertyCodeFixProvider : CodeFixProvider
         var diagnosticSpan      =   diagnostic.Location.SourceSpan;
         var title               =   LocalizableDescriptorTitles[ descriptorIndex ];
 
-        var classDeclaration    =   root?.FindToken( diagnosticSpan.Start).Parent?.AncestorsAndSelf()
-                                                                          .OfType<ClassDeclarationSyntax>().First();
-        if ( classDeclaration is not null && diagnostic.Id == "GLLBP001" )
-        { 
-            var codeAction  =  CodeAction.Create( title, 
-                                                  async ct => await CodeFixes[ descriptorIndex ]( context.Document, classDeclaration, ct ).ConfigureAwait( false ),
-                                                  diagnostic.Id );
-            context.RegisterCodeFix( codeAction, diagnostic );
-            return;
-        }
-
-        var fieldDeclaration    =   root?.FindToken( diagnosticSpan.Start).Parent?.AncestorsAndSelf()
-                                                                          .OfType<FieldDeclarationSyntax>().First();
-        if ( fieldDeclaration is not null && diagnostic.Id == "GLLBP002" )
+        switch ( diagnostic.Id )
         {
-            var codeAction  =  CodeAction.Create( title,
-                                                  async ct => await CodeFixes[ descriptorIndex ]( context.Document, fieldDeclaration, ct ).ConfigureAwait( false ),
-                                                  diagnostic.Id );
-            context.RegisterCodeFix( codeAction, diagnostic );
-            return;
+            case "GLLBP001":
+            {
+                var classDeclaration    =   root?.FindToken( diagnosticSpan.Start )
+                                                 .Parent?.AncestorsAndSelf()
+                                                 .OfType<ClassDeclarationSyntax>().First();
+
+                if ( classDeclaration is null )
+                    return;
+
+                var codeAction  =  CodeAction.Create( title,
+                                                      async ct => await MakePartialAsync( context.Document, classDeclaration, ct ),
+                                                      diagnostic.Id );
+
+                context.RegisterCodeFix( codeAction, diagnostic );
+                break;
+            }
+
+            case "GLLBP002":
+            {
+                var fieldDeclaration    =   root?.FindToken( diagnosticSpan.Start )
+                                                 .Parent?.AncestorsAndSelf()
+                                                 .OfType<FieldDeclarationSyntax>().First();
+
+                if ( fieldDeclaration is null )
+                    return;
+
+                var codeAction  =  CodeAction.Create( title,
+                                                      async ct => await RemoveAmbiguousFields( context.Document, fieldDeclaration, ct ),
+                                                      diagnostic.Id );
+
+                context.RegisterCodeFix( codeAction, diagnostic );
+                break;
+            }
         }
     }
 
@@ -91,17 +93,6 @@ public class BindablePropertyCodeFixProvider : CodeFixProvider
     {
         var classDeclaration    =   (ClassDeclarationSyntax)typeDeclaration;
         var updatedModifiers    =   classDeclaration.Modifiers.Add( SyntaxFactory.Token(SyntaxKind.PartialKeyword) );
-        var newClassDeclaration =   classDeclaration.WithModifiers( updatedModifiers );
-
-        var oldRoot             =   await document.GetSyntaxRootAsync( cancellationToken ).ConfigureAwait( false );
-        var newRoot             =   oldRoot!.ReplaceNode( classDeclaration, newClassDeclaration );
-        return document.WithSyntaxRoot( newRoot );
-    }
-
-    static async Task<Document> RemoveStaticAsync( Document document, CSharpSyntaxNode typeDeclaration, CancellationToken cancellationToken )
-    {
-        var classDeclaration    =   (ClassDeclarationSyntax)typeDeclaration;
-        var updatedModifiers    =   classDeclaration.Modifiers.Remove( SyntaxFactory.Token(SyntaxKind.StaticKeyword) );
         var newClassDeclaration =   classDeclaration.WithModifiers( updatedModifiers );
 
         var oldRoot             =   await document.GetSyntaxRootAsync( cancellationToken ).ConfigureAwait( false );

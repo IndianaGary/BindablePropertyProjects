@@ -21,22 +21,41 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BindablePropertyAttributes\BindablePropertyAttributes.csproj" PrivateAssets="all" />
-      <ProjectReference Include="..\BindablePropertyAnalyzerAndCodeFix\BindablePropertyAnalyzerAndCodeFix.csproj" PrivateAssets="all" />
+      <ProjectReference Include="..\BindablePropertyAnalyzerAndCodeFix\BindablePropertyCodeFix.csproj" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="AnalyzerReleases.Shipped.md" />
+      <None Remove="AnalyzerReleases.Unshipped.md" />
+      <None Remove="bin\Debug\netstandard2.0\\BindablePropertyGenerator.dll" />
     </ItemGroup>
 
   <ItemGroup>
     <!-- Pack the generator dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAnalyzerAndCodeFix.dll" />
 
     <!-- Pack the Analyzer and CodeFix dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\BindablePropertyAnalyzerAndCodeFix.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
 
       <!-- Pack the attributes dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\BindablePropertyAttributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
+    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
 
     <!-- Pack the attributes dll in the lib\netstandard2.0 path -->
     <None Include="$(OutputPath)\BindablePropertyAttributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Analyzer\AnalyzerResources.resx">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+    </EmbeddedResource>
   </ItemGroup>
     
 </Project>

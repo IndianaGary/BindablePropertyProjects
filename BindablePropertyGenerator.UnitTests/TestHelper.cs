@@ -1,5 +1,6 @@
 ﻿namespace BindablePropertyGenerator.UnitTests;
 
+using BindablePropertyFeatures;
 using BindablePropertyAttributes;
 
 public static class ModuleInitializer

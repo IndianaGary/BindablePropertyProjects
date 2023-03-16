@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BindablePropertyAnalyzerAndCodeFix.CodeFix {
+namespace BindablePropertyCodeFix {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BindablePropertyAnalyzerAndCodeFix.CodeFix {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BindablePropertyAnalyzerAndCodeFix.CodeFix.CodeFixResources", typeof(CodeFixResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BindablePropertyCodeFix.CodeFixResources", typeof(CodeFixResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

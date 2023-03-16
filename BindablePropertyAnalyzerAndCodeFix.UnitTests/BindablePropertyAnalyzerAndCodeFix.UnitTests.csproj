@@ -11,8 +11,9 @@
 	</PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BindablePropertyAnalyzerAndCodeFix\BindablePropertyAnalyzerAndCodeFix.csproj" />
+        <ProjectReference Include="..\BindablePropertyAnalyzerAndCodeFix\BindablePropertyCodeFix.csproj" />
         <ProjectReference Include="..\BindablePropertyAttributes\BindablePropertyAttributes.csproj" />
+        <ProjectReference Include="..\BindablePropertyGenerator\BindablePropertyGenerator.csproj" />
     </ItemGroup>
 
     <ItemGroup>

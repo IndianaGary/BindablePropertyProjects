@@ -1,10 +1,11 @@
-﻿namespace BindablePropertyGenerator;
+﻿namespace BindablePropertyServices;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Immutable;
 
-public static class GeneratorHelpers
+public static class Helpers
 {
     public static ImmutableHashSet<string> ValidAttributeArguments
             => ImmutableHashSet.Create(
@@ -20,56 +21,68 @@ public static class GeneratorHelpers
                                       );
 
     public static ImmutableHashSet<string> ValidBindingModes
-            => ImmutableHashSet.Create( 
-                                        "Default", 
-                                        "OneTime", 
-                                        "OneWay", 
-                                        "OneWayToSource", 
-                                        "TwoWay" 
+            => ImmutableHashSet.Create(
+                                        "Default",
+                                        "OneTime",
+                                        "OneWay",
+                                        "OneWayToSource",
+                                        "TwoWay"
                                       );
 
     /// <summary>
     /// Validate attribute name with or without qualification
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public static bool IsValidAttribute( NameSyntax? name )
     {
-        if ( name is SimpleNameSyntax simple && 
-             simple.Identifier.Text is "BindableProperty" or "BindablePropertyAttribute" )
-            return true;
+        switch ( name )
+        {
+            case SimpleNameSyntax simple when simple.Identifier.Text is "BindableProperty" or "BindablePropertyAttribute":
+                return true;
 
-        return name is QualifiedNameSyntax qualified &&
-             qualified.Right.Identifier.Text is "BindableProperty" 
-                                             or "BindablePropertyAttribute" &&
-             qualified.Left is SimpleNameSyntax nameSpace &&
-             nameSpace.Identifier.Text is "BindablePropertyAttributes";
+            default:
+                return name is QualifiedNameSyntax qualified &&
+                     qualified.Right.Identifier.Text is "BindableProperty" or "BindablePropertyAttribute" &&
+                     qualified.Left is SimpleNameSyntax nameSpace &&
+                     nameSpace.Identifier.Text is "BindablePropertyAttributes";
+        }
     }
 
-    public static bool HasValidAttributeArguments( AttributeSyntax attributeSyntax )
+    /// <summary>
+    /// Validate the attribute's argument list
+    /// </summary>
+    public static bool HasInvalidAttributeArguments( AttributeSyntax attributeSyntax, out string? errorArgument, 
+                                                                                      out Location? errorLocation )
     {
-        //  No arguments is valid
+        errorLocation = null;
+        errorArgument = null;
+
+        //  No arguments is a valid result
         if ( attributeSyntax.ArgumentList is null || attributeSyntax.ArgumentList.Arguments.Count == 0 )
-            return true;
+            return false;
 
         foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
         {
             var argumentName =  argument?.NameEquals?.Name.Identifier.Text;
 
-            if ( argumentName is null || ! ValidAttributeArguments.Contains( argumentName ) )
-                break;
+            if ( argumentName is not null && ! ValidAttributeArguments.Contains( argumentName ) )
+            {
+                errorArgument = argumentName;
+                errorLocation = argument?.NameEquals?.Name.GetLocation();
+                return true;
+            }
         }
 
         return false;
     }
 
     /// <summary>
-    /// This is a BindableProperty, so check for a valid BindingMode
+    /// If this is a BindingMode argument, so check for a valid BindingMode
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static bool IsValidBindingMode( AttributeSyntax attributeSyntax )
+    public static bool IsInvalidBindingMode( AttributeSyntax attributeSyntax, out string? argumentValue, out Location? location )
     {
+        location        = null;
+        argumentValue   = null;
+
         if ( attributeSyntax.ArgumentList is not null )
             foreach ( var argument in attributeSyntax.ArgumentList.Arguments )
             {
@@ -84,15 +97,20 @@ public static class GeneratorHelpers
                     if ( expr.StartsWith( "BindingMode." ) )
                         expr = expr.Substring( expr.IndexOf( '.' ) + 1 );
 
-                    return ValidBindingModes.Contains( expr );
+                    if ( ValidBindingModes.Contains( expr ) )
+                        break;
+
+                    argumentValue   = expr;
+                    location        = argument?.Expression.GetLocation();
+                    return true;
                 }
             }
 
-        return true;
+        return false;
     }
 
     /// <summary>
-    /// Used by the generator to determine whether the specified field is valid.
+    /// Used by to determine whether the specified field is valid.
     /// </summary>
     public static bool IsValidFieldSymbol( ISymbol symbol )
     {
@@ -111,6 +129,9 @@ public static class GeneratorHelpers
         return result;
     }
 
+    /// <summary>
+    /// Given a field, locate its class declaration
+    /// </summary>
     public static bool TryGetDeclaringClass( FieldDeclarationSyntax fieldDeclaration, out ClassDeclarationSyntax? classDeclaration )
     {
         var parentNode      =   fieldDeclaration.Parent;
@@ -118,7 +139,7 @@ public static class GeneratorHelpers
         //  Find declaring class
         while ( parentNode is not null and not ClassDeclarationSyntax )
             parentNode = parentNode.Parent;
-                
+
         if ( parentNode is null )
         {
             classDeclaration = null;
@@ -135,7 +156,7 @@ public static class GeneratorHelpers
     public static string GetFullyQualifiedNamespaceName( TypeDeclarationSyntax typeDeclaration, out bool isFileScoped )
     {
         //  Extract class name
-        isFileScoped   = false;
+        isFileScoped = false;
 
         //  Look for the nearest namespace declaration by walking the syntax tree
         var parentNode = typeDeclaration.Parent;
@@ -163,7 +184,7 @@ public static class GeneratorHelpers
             {
                 //  Prefix the inner namespace with the next outer namespace
                 namespaceDeclaration = namespaceParent;
-                namespaceName        = namespaceDeclaration.Name.ToString() + "." + namespaceName;
+                namespaceName = namespaceDeclaration.Name.ToString() + "." + namespaceName;
             }
         }
 

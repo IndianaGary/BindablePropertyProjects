@@ -2,7 +2,8 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using VerifyCS = CSharpCodeFixVerifier<BindablePropertyAnalyzer, BindablePropertyCodeFixProvider>;
+using VerifyCS = CSharpCodeFixVerifier<BindablePropertyFeatures.BindablePropertyAnalyzer, 
+                                       BindablePropertyCodeFix.BindablePropertyCodeFixProvider>;
 
 [TestClass]
 public class CodeFixUnitTests

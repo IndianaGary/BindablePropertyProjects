@@ -1,22 +1,20 @@
-﻿namespace BindablePropertyGenerator;
+﻿namespace BindablePropertyFeatures;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
-using static StringExtensions;
+using BindablePropertyServices;
 
 [Generator( LanguageNames.CSharp )]
 public sealed class BindablePropertyGenerator : IIncrementalGenerator
 {
-    const string _mauiControlsAssembly              = "Microsoft.Maui.Controls";
-    const string _mauiGraphicsAssembly              = "Microsoft.Maui.Graphics";
-
-    public string?   _namespaceName          = null;
-    public bool      _isFileScopedNamespace  = false; 
-    public string?   _version;
+    const string    _mauiControlsAssembly   = "Microsoft.Maui.Controls";
+    const string    _mauiGraphicsAssembly   = "Microsoft.Maui.Graphics";
+    public string?  _namespaceName          = null;
+    public bool     _isFileScopedNamespace  = false; 
+    public string?  _version;
 
     public BindablePropertyGenerator() => _version = typeof( BindablePropertyGenerator )
                                                      .Assembly
@@ -30,8 +28,8 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
     {
         //  Look for fields that have a BindbaleProperty attribute applied
         var bpModels = initContext.SyntaxProvider.CreateSyntaxProvider(
-                                                    predicate: (node, _ )     =>  IsAttributeOrClassDeclaration( node ),
-                                                    transform: (context, _ )  =>  BuildGenerationModel( context ) )
+                                                        predicate: (node, _ )     =>  IsAttributeOrClassDeclaration( node ),
+                                                        transform: (context, _ )  =>  BuildGenerationModel( context ) )
                                                  .Where( static model => model is not null && model.IsInitialized )
                                                  .Collect(); 
 
@@ -47,17 +45,16 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
         switch ( node )
         {
             case AttributeSyntax attribute:
-                return GeneratorHelpers.IsValidAttribute( attribute.Name ) &&
-                       GeneratorHelpers.HasValidAttributeArguments( attribute ) &&
-                       GeneratorHelpers.IsValidBindingMode( attribute );
+                return Helpers.IsValidAttribute( attribute.Name ) &&
+                       ! Helpers.HasInvalidAttributeArguments( attribute, out var _, out var _  ) &&
+                       ! Helpers.IsInvalidBindingMode( attribute, out var _, out var _ );
 
             case ClassDeclarationSyntax cls:
                 if ( cls.IsValidClassDeclaration() && _namespaceName is null )
                 {
-                    _namespaceName = GeneratorHelpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
+                    _namespaceName = Helpers.GetFullyQualifiedNamespaceName( cls, out var isFileScoped );
                     _isFileScopedNamespace = isFileScoped;
                 }
-
                 break;
 
             default:
@@ -96,7 +93,7 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
             return model;
 
         //  Only handle MY BindableProperty attributes
-        if ( ! GeneratorHelpers.IsValidFieldSymbol( fieldType ) )
+        if ( ! Helpers.IsValidFieldSymbol( fieldType ) )
             return model;
 
         //  Fill in information from the field
@@ -129,7 +126,7 @@ public sealed class BindablePropertyGenerator : IIncrementalGenerator
         if ( models.IsDefaultOrEmpty )
             return;
 
-        var indent      =   _isFileScopedNamespace ? "" : "    ";
+        var indent = _isFileScopedNamespace ? "" : "    ";
 
         foreach ( var model in models )
         { 

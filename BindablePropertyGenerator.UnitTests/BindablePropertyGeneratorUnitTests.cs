@@ -4,7 +4,7 @@ namespace BindablePropertyGenerator.UnitTests;
 public class BindablePropertyGeneratorUnitTests
 {
     [Fact]
-    public Task Generates_Nothing_Because_No_Partial_Class()
+    public async Task Generates_Nothing_Because_No_Partial_Class()
     {
         var source = """
         namespace UnitTest;
@@ -18,11 +18,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_Nothing_Because_Too_Many_Fields()
+    public async Task Generates_Nothing_Because_Too_Many_Fields()
     {
         var source = """
         namespace UnitTest;
@@ -36,11 +36,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_File_Scoped_Namespace()
+    public async Task Generates_File_Scoped_Namespace()
     {
         var source = """
         namespace UnitTest;
@@ -54,11 +54,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_Inline_Namespace()
+    public async Task Generates_Inline_Namespace()
     {
         var source = """
         using BindablePropertyAttributes;
@@ -73,11 +73,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_Inline_Nested_Namespace()
+    public async Task Generates_Inline_Nested_Namespace()
     {
         var source = """
         using BindablePropertyAttributes;
@@ -95,11 +95,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_Full_Attribute_Specification()
+    public async Task Generates_Full_Attribute_Specification()
     {
         var source = """
         using BindablePropertyAttributes;
@@ -114,11 +114,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_Fully_Qualified_Attribute_Specification()
+    public async Task Generates_Fully_Qualified_Attribute_Specification()
     {
         var source = """
         namespace UnitTest
@@ -131,10 +131,10 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
     [Fact]
-    public Task Generates_DefaultValue_Argument()
+    public async Task Generates_DefaultValue_Argument()
     {
         var source = """
         namespace UnitTest;
@@ -154,11 +154,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_DeclaringType_Override()
+    public async Task Generates_DeclaringType_Override()
     {
         var source = """
         namespace UnitTest;
@@ -172,11 +172,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_BindingMode_Default()
+    public async Task Generates_BindingMode_Default()
     {
         var source = """
         namespace UnitTest;
@@ -190,11 +190,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_BindingMode_Full()
+    public async Task Generates_BindingMode_Full()
     {
         var source = """
         namespace UnitTest;
@@ -208,11 +208,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_ValidateValue()
+    public async Task Generates_ValidateValue()
     {
         var source = """
         namespace UnitTest;
@@ -226,11 +226,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_PropertyChanged()
+    public async Task Generates_PropertyChanged()
     {
         var source = """
         namespace UnitTest;
@@ -244,11 +244,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_PropertyChanging()
+    public async Task Generates_PropertyChanging()
     {
         var source = """
         namespace UnitTest;
@@ -262,11 +262,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_CoerceValue()
+    public async Task Generates_CoerceValue()
     {
         var source = """
         namespace UnitTest;
@@ -280,11 +280,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_DefaultValueCreator()
+    public async Task Generates_DefaultValueCreator()
     {
         var source = """
         namespace UnitTest;
@@ -298,11 +298,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_HidesBaseProperty()
+    public async Task Generates_HidesBaseProperty()
     {
         var source = """
         namespace UnitTest;
@@ -319,11 +319,11 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 
     [Fact]
-    public Task Generates_All_BaseProperty()
+    public async Task Generates_All_BaseProperty()
     {
         var source = """
         namespace UnitTest;
@@ -340,6 +340,6 @@ public class BindablePropertyGeneratorUnitTests
         }
         """;
 
-        return TestHelper.Verify( source );
+        await TestHelper.Verify( source );
     }
 }

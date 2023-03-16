@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindablePropertyAttributes"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindablePropertyAnalyzerAndCodeFix.UnitTests", "BindablePropertyAnalyzerAndCodeFix.UnitTests\BindablePropertyAnalyzerAndCodeFix.UnitTests.csproj", "{2C4FCAA0-61F7-447C-B07E-F0391DB200D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindablePropertyAnalyzerAndCodeFix", "BindablePropertyAnalyzerAndCodeFix\BindablePropertyAnalyzerAndCodeFix.csproj", "{8B70999F-54FB-49DB-B914-25218FCF00FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindablePropertyCodeFix", "BindablePropertyAnalyzerAndCodeFix\BindablePropertyCodeFix.csproj", "{8B70999F-54FB-49DB-B914-25218FCF00FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BindablePropertyMauiTest", "BindablePropertyMauiTest\BindablePropertyMauiTest.csproj", "{FE6E50C0-5684-403E-ACFF-20BCB1A81EB6}"
 EndProject
