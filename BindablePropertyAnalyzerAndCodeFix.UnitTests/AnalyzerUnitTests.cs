@@ -107,7 +107,6 @@ public class AnalyzerUnitTests
               isEnabledByDefault: true
             );
 
-
         //  Act
         var myError1     = VerifyCS.Diagnostic( expected1 ).WithSpan( 9, 24, 9, 39 ).WithArguments("InvalidArgument");
         var myError2     = VerifyCS.Diagnostic( expected2 ).WithSpan( 9, 24, 9, 39 ).WithArguments("InvalidArgument");
@@ -160,7 +159,7 @@ public class AnalyzerUnitTests
             """;
 
         //  Act
-        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 43, 9, 64 ).WithArguments("BadMode"); ;
+        var expected = VerifyCS.Diagnostic( "GLLBP003" ).WithSpan( 9, 43, 9, 64 ).WithArguments("BadMode");
 
         //  Assert
         await VerifyCS.VerifyAnalyzerAsync( codeToTest, expected );

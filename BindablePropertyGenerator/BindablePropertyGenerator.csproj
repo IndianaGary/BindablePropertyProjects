@@ -7,10 +7,10 @@
       <ImplicitUsings>true</ImplicitUsings>
       <LangVersion>11.0</LangVersion>
       <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-      <Version>0.6.7.0-beta</Version>
-      <AssemblyVersion>0.6.7.0</AssemblyVersion>
+      <Version>0.6.8.0-beta</Version>
+      <AssemblyVersion>0.6.8.0</AssemblyVersion>
       <Authors>Gerald L Lewis</Authors>
-      <Description>A Roslyn 4.2 Incremental Source Generator for Maui BindableProperty</Description>
+      <Description>A Roslyn 4.2 Analyzer and Incremental Source Generator for Maui BindableProperty</Description>
       <Copyright>Copyright (c) 2023</Copyright>
   </PropertyGroup>
 
@@ -21,7 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BindablePropertyAttributes\BindablePropertyAttributes.csproj" PrivateAssets="all" />
-      <ProjectReference Include="..\BindablePropertyAnalyzerAndCodeFix\BindablePropertyCodeFix.csproj" PrivateAssets="all" />
+      <ProjectReference Include="..\BindablePropertyCodeFix\BindablePropertyCodeFix.csproj" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,18 +31,14 @@
     </ItemGroup>
 
   <ItemGroup>
-    <!-- Pack the generator dll in the analyzers/dotnet/cs path -->
+    <!-- Pack the analyzer and generator dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAnalyzerAndCodeFix.dll" />
 
-    <!-- Pack the Analyzer and CodeFix dll in the analyzers/dotnet/cs path -->
-    <None Include="$(OutputPath)\BindablePropertyAnalyzerAndCodeFix.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
+    <!-- Pack the codeFix dll in the analyzers/dotnet/cs path -->
+    <None Include="$(OutputPath)\BindablePropertyCodeFix.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
       <!-- Pack the attributes dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\BindablePropertyAttributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
-    <None Remove="bin\Debug\netstandard2.0\\BindablePropertyAttributes.dll" />
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
     <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
 

@@ -10,7 +10,7 @@
         <Version>0.6.7.0-beta</Version>
         <AssemblyVersion>0.6.7.0</AssemblyVersion>
         <Authors>Gerald L Lewis</Authors>
-        <Description>A Roslyn 4.2 Analyer/CodeFix Complement to an Incremental Source Generator for Maui BindableProperty</Description>
+        <Description>A Roslyn 4.2 CodeFix an Analyzer and Incremental Source Generator for Maui BindableProperty</Description>
         <Copyright>Copyright (c) 2023</Copyright>
     </PropertyGroup>
 
